@@ -5,11 +5,14 @@ from pyspark.sql.functions import col
 from pyspark.sql.types import DateType, IntegerType, LongType, DoubleType
 from pyspark.ml.linalg import Vectors
 from pyspark.ml.feature import VectorAssembler
+from pyspark.mllib import RegressionMetrics
 import pickle
 
-sc = pyspark.SparkContext("local[*]")
-spark = pyspark.sql.SparkSession(sc)
-
+try:
+    sc = pyspark.SparkContext("local[*]")
+    spark = pyspark.sql.SparkSession(sc)
+except ValueError:
+    pass
 
 df = spark.read.parquet(
     "../data/02_intermediate/nfip-flood-policies.parquet", inferSchema=True
@@ -76,12 +79,24 @@ model.setSeed(0)
 
 print("Started fitting model")
 
-model.fit(train)
+trained_model = model.fit(train)
 
-with open("pickled_model", "wb") as file:
-    pickle.dump(model, file, pickle.HIGHEST_PROTOCOL)
+predictions = trained_model.transform(test)
 
-predictions = model.transform(test)
+val_pred_df = predictions.select(["totalinsurancepremiumofthepolicy", "prediction"])
+val_pred_df = val_pred_df.withColumn(
+    "totalinsurancepremiumofthepolicy",
+    val_pred_df["totalinsurancepremiumofthepolicy"].cast(DoubleType()),
+)
 
-test.write.save("test.csv", mode="overwrite")
-predictions.write.save("predictions.csv", mode="overwrite")
+val_pred = val_pred_df.rdd.map(tuple)
+
+metrics = RegressionMetrics(val_pred)
+
+metrics_dict = {}
+
+metrics_dict["r2"] = metrics.r2
+metrics_dict["explainedVariance"] = metrics.explainedVariance
+metrics_dict["meanAbsoluteError"] = metrics.meanAbsoluteError
+metrics_dict["meanSquaredError"] = metrics.meanSquaredError
+metrics_dict["rootMeanSquaredError"] = metrics.rootMeanSquaredError
