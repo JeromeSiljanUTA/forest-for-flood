@@ -5,17 +5,15 @@ Reads data from csv, cleans and outputs as parquet
 import pyspark
 
 
-def clean_write_parquet():
+def clean_write_parquet(spark):
     """
     Creates spark session, drops appropriate columns, and writes data to parquet file
 
     """
-    sc = pyspark.SparkContext("local[*]")
-    spark = pyspark.sql.SparkSession(sc)
 
     df = spark.read.csv(
         # Go back out of d01_data, then src
-        "../../data/01_raw/NFIP/nfip-flood-policies.csv",
+        "../data/01_raw/NFIP/nfip-flood-policies.csv",
         header=True,
         inferSchema=True,
     )
