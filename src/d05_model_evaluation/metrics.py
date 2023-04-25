@@ -2,7 +2,7 @@
 Evaluate model against test set, provide metrics
 """
 
-from pyspark.mllib import RegressionMetrics
+from pyspark.mllib.evaluation import RegressionMetrics
 from pyspark.ml.regression import RandomForestRegressor
 from pyspark.sql.types import DoubleType
 
