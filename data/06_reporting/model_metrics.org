@@ -1,3 +1,17 @@
+* Model Type 1
+** Inputs
++ censustract
++ crsdiscount
++ elevationdifference
++ federalpolicyfee
++ hfiaasurcharge
++ latitude
++ longitude
++ numberoffloorsininsuredbuilding
++ policycost
++ policycount
+
+  
 | Depth |                  r2 |                MAE |                MSE |               rMSE |
 |     5 |  0.3114752982953377 | 231.46697672343765 | 1231114.2602807723 | 1109.5558842531423 |
 |     6 |  0.3912370025083539 | 197.48394247735217 | 1163302.7993032774 | 1078.5651576531097 |
