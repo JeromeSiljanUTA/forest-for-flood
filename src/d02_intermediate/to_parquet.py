@@ -13,12 +13,12 @@ def clean_write_parquet(spark):
 
     df = spark.read.csv(
         # Go back out of d01_data, then src
-        "../data/01_raw/NFIP/nfip-flood-policies.csv",
+        "data/01_raw/NFIP/nfip-flood-policies.csv",
         header=True,
         inferSchema=True,
     )
 
-    # Drop columns that have a lot of null values, then all rows with null values
+    # Drop columns that have a lot of null/date values, then all rows with null values
     df = df.drop(
         *[
             "basefloodelevation",
@@ -31,10 +31,13 @@ def clean_write_parquet(spark):
             "lowestfloorelevation",
             "nonprofitindicator",
             "obstructiontype",
+            "originalconstructiondate",
+            "originalnbdate",
+            "policyeffectivedate",
+            "policyterminationdate",
+            "policytermindicator",
             "smallbusinessindicatorbuilding",
         ]
     ).dropna()
 
-    df.write.save(
-        "../data/02_intermediate/nfip-flood-policies.parquet", mode="overwrite"
-    )
+    df.write.save("data/02_intermediate/nfip-flood-policies.parquet", mode="overwrite")

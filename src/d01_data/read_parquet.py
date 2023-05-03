@@ -15,14 +15,8 @@ def clean_parquet_df(spark):
     :returns: pyspark DataFrame of parquet data
 
     """
-    df = spark.read.parquet(
-        "../data/02_intermediate/nfip-flood-policies.parquet", inferSchema=True
-    )
 
-    # Drop date columns
-    df = df.drop(
-        *["policyeffectivedate", "policyterminationdate", "policytermindicator"]
-    )
+    df = spark.read.parquet("data/02_intermediate/nfip-flood-policies.parquet")
 
     # Cast types
     df = (
@@ -39,10 +33,6 @@ def clean_parquet_df(spark):
             "numberoffloorsininsuredbuilding",
             col("numberoffloorsininsuredbuilding").cast(IntegerType()),
         )
-        .withColumn(
-            "originalconstructiondate", col("originalconstructiondate").cast(DateType())
-        )
-        .withColumn("originalnbdate", col("originalnbdate").cast(DateType()))
         .withColumn("policycost", col("policycost").cast(IntegerType()))
         .withColumn("policycount", col("policycount").cast(IntegerType()))
         .withColumn(
@@ -58,4 +48,5 @@ def clean_parquet_df(spark):
             col("totalinsurancepremiumofthepolicy").cast(IntegerType()),
         )
     )
+
     return df
