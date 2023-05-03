@@ -20,15 +20,15 @@ def transform_into_vector(spark, df):
         # Exclude string columns
         inputCols=[
             "censustract",
-            "crsdiscount",
+            # "crsdiscount", lots of 0 values
             "elevationdifference",
             "federalpolicyfee",
-            "hfiaasurcharge",
+            # "hfiaasurcharge", lots of 0 values
             "latitude",
             "longitude",
             "numberoffloorsininsuredbuilding",
-            "policycost",
-            "policycount",
+            # "policycost", this is calculated by FEMA
+            # "policycount", all 1
         ],
         outputCol="features",
     )
