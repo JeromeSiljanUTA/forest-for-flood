@@ -23,12 +23,16 @@ if os.getcwd().split("/")[-1] != "forest-for-flood":
             "Make sure to start program from toplevel (eg. python src/__init__.py)"
         )
 
-TRAIN_MODEL = False
-LOAD_MODEL = True
+TRAIN_MODEL = True
+LOAD_MODEL = False
 
-sc = pyspark.SparkContext("local[*]")
+spark = (
+    pyspark.sql.SparkSession.builder.master("local[*]")
+    .config("spark.driver.memory", "10g")
+    .getOrCreate()
+)
 
-spark = pyspark.sql.SparkSession(sc)
+sc = spark.sparkContext
 
 # Create parquet if it doesn't yet exist
 if not os.path.exists("data/02_intermediate/nfip-flood-policies.parquet"):
@@ -41,20 +45,14 @@ if os.path.exists("data/02_intermediate/nfip-flood-policies.parquet"):
 
 if TRAIN_MODEL:
     train_df, test_df, validation_df = transform_into_vector(spark, df)
-    depths = range(5, 20)
+    depths = range(13, 20)
     for depth in depths:
         trained_model = fit_model(train_df, depth, save=True)
-        try:
-            predictions_df = create_predictions(test_df, trained_model)
-            metrics_dict = calculate_metrics(predictions_df)
-            with open(f"data/04_models/model_depth_{depth}_metrics.pkl") as pickle_file:
-                pickle.dump(metrics_dict, pickle_file)
-        except:
-            pass
 
-continue_load = True
 
 if LOAD_MODEL:
+    continue_load = True
+
     train_df, test_df, validation_df = transform_into_vector(spark, df)
     while continue_load:
         print("Which model would you like to load?")
