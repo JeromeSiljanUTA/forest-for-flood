@@ -1,15 +1,14 @@
 * Model Type 1
+
 ** Inputs
 + censustract
-+ crsdiscount
 + elevationdifference
 + federalpolicyfee
-+ hfiaasurcharge
 + latitude
 + longitude
 + numberoffloorsininsuredbuilding
-+ policycost
-+ policycount
+
+With 40 trees (tested and performed better than 20 trees)
 
   
 | Depth |                  r2 |                MAE |                MSE |               rMSE |
@@ -21,3 +20,4 @@
 |    10 |  0.5419040769539529 | 138.31945617491704 | 1022605.0448560107 | 1011.2393608122711 |
 |    11 |  0.5577762696204209 | 131.32631110401425 | 1004659.8326529753 | 1002.3272083770726 |
 |    12 |  0.5703165962614429 |  126.2715559530854 |  992329.8370859065 |  996.1575362792305 |
+
