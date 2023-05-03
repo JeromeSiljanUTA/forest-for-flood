@@ -2,9 +2,10 @@
 Calls all other methods to clean data, train model, and assess accuracy
 
 """
-import os
-import pyspark
 import logging
+import os
+import pickle
+import pyspark
 
 from d01_data.read_parquet import clean_parquet_df
 from d02_intermediate.to_parquet import clean_write_parquet
@@ -22,9 +23,8 @@ if os.getcwd().split("/")[-1] != "forest-for-flood":
             "Make sure to start program from toplevel (eg. python src/__init__.py)"
         )
 
-TRAIN_MODEL = True
-
-trained_model_arr = []
+TRAIN_MODEL = False
+LOAD_MODEL = True
 
 sc = pyspark.SparkContext("local[*]")
 
@@ -44,3 +44,34 @@ if TRAIN_MODEL:
     depths = range(5, 20)
     for depth in depths:
         trained_model = fit_model(train_df, depth, save=True)
+        try:
+            predictions_df = create_predictions(test_df, trained_model)
+            metrics_dict = calculate_metrics(predictions_df)
+            with open(f"data/04_models/model_depth_{depth}_metrics.pkl") as pickle_file:
+                pickle.dump(metrics_dict, pickle_file)
+        except:
+            pass
+
+continue_load = True
+
+if LOAD_MODEL:
+    train_df, test_df, validation_df = transform_into_vector(spark, df)
+    while continue_load:
+        print("Which model would you like to load?")
+        for model in os.listdir("data/04_models"):
+            print(model)
+
+        print(" > ")
+        model_name = input()
+
+        if model_name == "quit":
+            continue_load = False
+        else:
+            trained_model = pyspark.ml.regression.RandomForestRegressionModel.load(
+                f"data/04_models/{model_name}"
+            )
+
+            predictions_df = create_predictions(test_df, trained_model)
+            metrics_dict = calculate_metrics(predictions_df)
+            print(f"{model_name} metrics:")
+            print(metrics_dict)

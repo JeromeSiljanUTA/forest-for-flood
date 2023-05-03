@@ -13,7 +13,9 @@ def create_predictions(test, trained_model):
 
 
 def calculate_metrics(predictions_df):
-    val_pred_df = predictions.select(["totalinsurancepremiumofthepolicy", "prediction"])
+    val_pred_df = predictions_df.select(
+        ["totalinsurancepremiumofthepolicy", "prediction"]
+    )
     val_pred_df = val_pred_df.withColumn(
         "totalinsurancepremiumofthepolicy",
         val_pred_df["totalinsurancepremiumofthepolicy"].cast(DoubleType()),
