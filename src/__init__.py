@@ -45,7 +45,7 @@ if os.path.exists("data/02_intermediate/nfip-flood-policies.parquet"):
 
 if TRAIN_MODEL:
     train_df, test_df, validation_df = transform_into_vector(spark, df)
-    depths = range(13, 20)
+    depths = range(8, 15)
     for depth in depths:
         trained_model = fit_model(train_df, depth, save=True)
 

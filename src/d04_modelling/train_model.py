@@ -14,7 +14,7 @@ def create_model(depth):
 
     """
     model = RandomForestRegressor(
-        labelCol="totalinsurancepremiumofthepolicy", maxDepth=depth
+        labelCol="totalinsurancepremiumofthepolicy", maxDepth=depth, numTrees=40
     )
     model.setSeed(0)
     return model
