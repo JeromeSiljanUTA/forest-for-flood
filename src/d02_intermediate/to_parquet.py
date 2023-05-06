@@ -9,8 +9,9 @@ def clean_write_parquet(spark):
     """
     Creates spark session, drops appropriate columns, and writes data to parquet file
 
-    """
+    :param spark: spark session
 
+    """
     df = spark.read.csv(
         # Go back out of d01_data, then src
         "data/01_raw/NFIP/nfip-flood-policies.csv",
