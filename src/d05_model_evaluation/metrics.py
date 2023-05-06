@@ -8,11 +8,27 @@ from pyspark.sql.types import DoubleType
 
 
 def create_predictions(test, trained_model):
+    """Create dataframe of predictions based on trained model
+
+    :param test: Dataframe of test dataset
+    :type test: Spark DataFrame
+    :param trained_model: Trained RandomForestRegressor model
+    :type trained_model: RandomForestRegressor
+    :returns:
+
+    """
     predictions_df = trained_model.transform(test)
     return predictions_df
 
 
 def calculate_metrics(predictions_df):
+    """Calculates accuracy metrics based on trained model
+
+    :param predictions_df: Dataframe of predictions from trained model
+    :type predictions_df: Spark DataFrame
+    :returns: Dictionary of metrics on prediction values
+
+    """
     val_pred_df = predictions_df.select(
         ["totalinsurancepremiumofthepolicy", "prediction"]
     )
