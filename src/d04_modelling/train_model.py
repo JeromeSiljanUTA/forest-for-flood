@@ -3,20 +3,22 @@ Train model and save to file
 """
 
 import logging
-
 from pyspark.ml.regression import RandomForestRegressor
 
 
 def create_model(depth):
     """Creates model, sets label column
 
-    :returns: Returns model object
+    :param depth: Set maximum depth of trees in forest
+    :type depth: int
+    :returns: model object
 
     """
     model = RandomForestRegressor(
         labelCol="totalinsurancepremiumofthepolicy", maxDepth=depth, numTrees=40
     )
     model.setSeed(0)
+
     return model
 
 
@@ -25,6 +27,10 @@ def fit_model(train_df, depth, save=False):
 
     :param train_df: Training data
     :type train_df: DataFrame
+    :param depth: Set maximum depth of trees in forest
+    :type depth: int
+    :param save: Set to save model to file if True
+    :type save: bool
     :returns: RandomForestRegressor object of trained model
 
     """
