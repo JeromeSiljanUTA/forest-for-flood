@@ -36,11 +36,13 @@ sc = spark.sparkContext
 
 # Create parquet if it doesn't yet exist
 if not os.path.exists("data/02_intermediate/nfip-flood-policies.parquet"):
-    print("Creating parquet file")
-    clean_write_parquet(spark)
+    # Create directory of it doesn't yet exist
+    if not os.path.exists("data/02_intermediate/"):
+        os.mkdir("data/02_intermediate/")
 
-# Read parquet if it exists
-if os.path.exists("data/02_intermediate/nfip-flood-policies.parquet"):
+    logging.info("Creating parquet file")
+    clean_write_parquet(spark)
+else:  # Read parquet if it exists
     df = clean_parquet_df(spark)
 
 if TRAIN_MODEL:
