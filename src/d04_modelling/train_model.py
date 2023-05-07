@@ -44,9 +44,14 @@ def fit_model(train_df, depth, num_trees, save=False):
 
     if save:
         model_name = f"data/04_models/model_{depth}_{num_trees}"
-        trained_model.save(model_name)
-        logging.info(
-            f"Successfully trained model with depth {depth} and {num_trees} trees"
-        )
 
+        try:
+            trained_model.save(model_name)
+            logging.info(
+                f"Successfully trained model with depth {depth} and {num_trees} trees"
+            )
+        except Py4JJavaError:
+            logging.warning(
+                f"Unable to save trained model with depth {depth} and {num_trees} trees\nCheck if existing model is present"
+                )
     return trained_model
