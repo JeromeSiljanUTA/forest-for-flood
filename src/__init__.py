@@ -61,8 +61,6 @@ if TRAIN_MODEL:
             metrics_dict = calculate_metrics(predictions_df)
             metrics_dict["model"] = f"{depth}, {num_trees}"
             metric_arr.append(metrics_dict)
-            break
-        break
 
     file_path = "data/06_reporting/metrics.pkl"
     logging.info(f"Writing metrics to {file_path}")
