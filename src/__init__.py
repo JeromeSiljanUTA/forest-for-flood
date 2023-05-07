@@ -42,14 +42,32 @@ if not os.path.exists("data/02_intermediate/nfip-flood-policies.parquet"):
 
     logging.info("Creating parquet file")
     clean_write_parquet(spark)
-else:  # Read parquet if it exists
-    df = clean_parquet_df(spark)
+
+# Load data into dataframe
+df = clean_parquet_df(spark)
+
+depths = range(5, 40)
+trees = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+
+metric_arr = []
 
 if TRAIN_MODEL:
+    logging.info("Starting to train models")
     train_df, test_df, validation_df = transform_into_vector(spark, df)
-    depths = range(8, 15)
-    for depth in depths:
-        trained_model = fit_model(train_df, depth, save=True)
+    for num_trees in trees:
+        for depth in depths:
+            trained_model = fit_model(train_df, depth, num_trees, save=True)
+            predictions_df = create_predictions(test_df, trained_model)
+            metrics_dict = calculate_metrics(predictions_df)
+            metrics_dict["model"] = f"{depth}, {num_trees}"
+            metric_arr.append(metrics_dict)
+            break
+        break
+
+    file_path = "data/06_reporting/metrics.pkl"
+    logging.info(f"Writing metrics to {file_path}")
+    with open(file_path, "ab") as f:
+        pickle.dump(metric_arr, f)
 
 
 if LOAD_MODEL:
