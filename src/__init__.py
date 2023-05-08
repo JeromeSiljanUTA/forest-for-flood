@@ -46,7 +46,8 @@ if not os.path.exists("data/02_intermediate/nfip-flood-policies.parquet"):
 # Load data into dataframe
 df = clean_parquet_df(spark)
 
-depths = range(5, 40)
+# Max depth of RandomForestRegressor goes to 30
+depths = range(5, 31)
 trees = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
 
 metric_arr = []
