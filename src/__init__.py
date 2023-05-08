@@ -28,8 +28,8 @@ LOAD_MODEL = False
 
 spark = (
     pyspark.sql.SparkSession.builder.master("local[*]")
-    .config("spark.driver.memory", "10g")
-    .getOrCreate()
+    # Set to 90G free for server
+    .config("spark.driver.memory", "90g").getOrCreate()
 )
 
 sc = spark.sparkContext
@@ -56,11 +56,16 @@ if TRAIN_MODEL:
     train_df, test_df, validation_df = transform_into_vector(spark, df)
     for num_trees in trees:
         for depth in depths:
-            trained_model = fit_model(train_df, depth, num_trees, save=True)
-            predictions_df = create_predictions(test_df, trained_model)
-            metrics_dict = calculate_metrics(predictions_df)
-            metrics_dict["model"] = f"{depth}, {num_trees}"
-            metric_arr.append(metrics_dict)
+            # Check if model has been trained; helps if only few models were trained
+            # because the program crashed
+            if not os.path.exists(f"data/04_models/model_{depth}_{num_trees}"):
+                trained_model = fit_model(train_df, depth, num_trees, save=True)
+                predictions_df = create_predictions(test_df, trained_model)
+                metrics_dict = calculate_metrics(predictions_df)
+                metrics_dict["model"] = f"{depth}, {num_trees}"
+                metric_arr.append(metrics_dict)
+            else:
+                logging.info(f"model_{depth}_{num_trees} exists, not training")
 
     file_path = "data/06_reporting/metrics.pkl"
     logging.info(f"Writing metrics to {file_path}")
