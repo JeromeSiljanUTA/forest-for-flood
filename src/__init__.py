@@ -28,8 +28,8 @@ LOAD_MODEL = False
 
 spark = (
     pyspark.sql.SparkSession.builder.master("local[*]")
-    # Set to 90G free for server
-    .config("spark.driver.memory", "90g").getOrCreate()
+    # Set to 50G free for server
+    .config("spark.driver.memory", "50g").getOrCreate()
 )
 
 sc = spark.sparkContext
@@ -75,25 +75,15 @@ if TRAIN_MODEL:
 
 
 if LOAD_MODEL:
-    continue_load = True
+    metrics_arr = []
 
     train_df, test_df, validation_df = transform_into_vector(spark, df)
     while continue_load:
-        print("Which model would you like to load?")
         for model in os.listdir("data/04_models"):
-            print(model)
-
-        print(" > ")
-        model_name = input()
-
-        if model_name == "quit":
-            continue_load = False
-        else:
             trained_model = pyspark.ml.regression.RandomForestRegressionModel.load(
                 f"data/04_models/{model_name}"
             )
 
             predictions_df = create_predictions(test_df, trained_model)
             metrics_dict = calculate_metrics(predictions_df)
-            print(f"{model_name} metrics:")
-            print(metrics_dict)
+            metrics_arr.append(metrics_dict)
