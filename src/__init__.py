@@ -23,8 +23,8 @@ if os.getcwd().split("/")[-1] != "forest-for-flood":
             "Make sure to start program from toplevel (eg. python src/__init__.py)"
         )
 
-TRAIN_MODEL = True
-LOAD_MODEL = False
+TRAIN_MODEL = False
+LOAD_MODEL = True
 
 spark = (
     pyspark.sql.SparkSession.builder.master("local[*]")
@@ -78,12 +78,12 @@ if LOAD_MODEL:
     metrics_arr = []
 
     train_df, test_df, validation_df = transform_into_vector(spark, df)
-    while continue_load:
-        for model in os.listdir("data/04_models"):
-            trained_model = pyspark.ml.regression.RandomForestRegressionModel.load(
-                f"data/04_models/{model_name}"
-            )
+    for model in os.listdir("data/04_models"):
+        trained_model = pyspark.ml.regression.RandomForestRegressionModel.load(
+            f"data/04_models/{model}"
+        )
 
-            predictions_df = create_predictions(test_df, trained_model)
-            metrics_dict = calculate_metrics(predictions_df)
-            metrics_arr.append(metrics_dict)
+        predictions_df = create_predictions(test_df, trained_model)
+        metrics_dict = calculate_metrics(predictions_df)
+        logging.info(f"{model} accuracy reported")
+        metrics_arr.append(metrics_dict)
